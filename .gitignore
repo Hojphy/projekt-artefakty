@@ -1,0 +1,11 @@
+archiwum
+
+*.exe
+*.dll
+
+*.o
+*.obj
+
+*.swp
+*.swo
+*~
