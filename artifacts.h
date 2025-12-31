@@ -1,6 +1,8 @@
 #ifndef ARTIFACTS_H
 #define ARTIFACTS_H
 
+#include "stdlib.h"
+
 typedef struct {
     char name[100];
     char origin[50];
