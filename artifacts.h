@@ -2,6 +2,11 @@
 #define ARTIFACTS_H
 
 #include "stdlib.h"
+#include "stdio.h"
+#include "stdlib.h"
+#include "string.h"
+#include "time.h"
+#include "errno.h"
 
 typedef struct {
     char name[100];
