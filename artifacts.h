@@ -1,8 +1,12 @@
 #ifndef ARTIFACTS_H
 #define ARTIFACTS_H
 
-#define ALPHABETICAL_SORT 1
-#define THREAT_SORT 2
+#define NAME_SORT 1
+#define ORIGIN_SORT 2
+#define CREATOR_SORT 3
+#define THREAT_SORT 4
+#define YEAR_SORT 5
+#define STATUS_SORT 6
 
 #include "stdlib.h"
 #include "stdio.h"
@@ -34,12 +38,12 @@ void init_archive(Archive *arch);
 void free_archive(Archive *arch);
 
 int add_artifact(Archive *arch, Artifact new_art);
+int edit_artifact(Archive *arch, Artifact *art, Artifact new_art);
 int remove_artifact_by_index(Archive *arch, int index);
 int remove_artifacts_by_criteria(Archive *arch, const char *origin);
 
 Archive* sort_archive(Archive* arch, int mode);
 Node* insert_node(Node* sorted_head, Node* new_node, int mode);
-Archive filter_archive(const Archive *arch, const char *query, int min_threat);
 
 int save_to_file(const Archive *arch, const char *filename);
 int load_from_file(Archive *arch, const char *filename);

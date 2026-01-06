@@ -24,9 +24,33 @@ void free_archive(Archive *arch)
 int add_artifact(Archive *arch, Artifact new_art) 
 {
     Node* new = calloc(1, sizeof(Node));
+    if (new == NULL)
+    {
+        return 0;
+    }
     new->data = new_art;
     new->next = arch->head;
     arch->head = new;
+    ++arch->count;
+    return 1;
+}
+
+int edit_artifact(Archive *arch, Artifact *art, Artifact new_art)
+{
+    Node *current = arch->head;
+    while (current != NULL && strcmp(current->data.name, art->name) != 0)
+    {
+        current = current->next;
+    }
+
+    if (current == NULL) return 0;
+
+    char original_name[100];
+    strcpy(original_name, current->data.name);
+
+    current->data = new_art;
+
+    strcpy(current->data.name, original_name);
     return 1;
 }
 
@@ -87,7 +111,7 @@ Node* insert_node(Node* sorted_head, Node* new_node, int mode)
     }
 
     int insert_on_start = 0;
-    if (mode == ALPHABETICAL_SORT) 
+    if (mode == NAME_SORT) 
     {
         if (strcmp(new_node->data.name, sorted_head->data.name) < 0) 
         {
@@ -115,7 +139,7 @@ Node* insert_node(Node* sorted_head, Node* new_node, int mode)
     {
         int condition_met = 0;
         
-        if (mode == ALPHABETICAL_SORT) 
+        if (mode == NAME_SORT) 
         {
             if (strcmp(p->next->data.name, new_node->data.name) > 0) condition_met = 1;
         }
