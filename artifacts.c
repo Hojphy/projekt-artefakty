@@ -54,6 +54,44 @@ int edit_artifact(Archive *arch, Artifact *art, Artifact new_art)
     return 1;
 }
 
+Artifact* find_artifact_by_name(Archive *arch, const char *name)
+{
+    Node *current = arch->head;
+    while (current != NULL && strcmp(current->data.name, name) != 0)
+    {
+        current = current->next;
+    }
+    if (current == NULL) return NULL;
+    return &current->data;
+}
+
+int remove_artifact_by_name(Archive *arch, const char *name)
+{
+    Node *current = arch->head;
+    Node *prev = NULL;
+    while (current != NULL && strcmp(current->data.name, name) != 0)
+    {
+        prev = current;
+        current = current->next;
+    }
+
+    if (current == NULL) return 0;
+    if (current->data.threat_level >= 8) return -1;
+
+    if (prev == NULL)
+    {
+        arch->head = current->next;
+    }
+    else 
+    {
+        prev->next = current->next;
+    }
+
+    free(current);
+    --arch->count;
+    return 1;
+}
+
 int save_to_file(const Archive *arch, const char *filename) 
 {
     FILE *fp = fopen(filename, "wb");

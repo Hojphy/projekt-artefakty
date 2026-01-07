@@ -39,8 +39,9 @@ void free_archive(Archive *arch);
 
 int add_artifact(Archive *arch, Artifact new_art);
 int edit_artifact(Archive *arch, Artifact *art, Artifact new_art);
-int remove_artifact_by_index(Archive *arch, int index);
-int remove_artifacts_by_criteria(Archive *arch, const char *origin);
+int remove_artifact_by_name(Archive *arch, const char *name);
+
+Artifact* find_by_name(Archive *arch, const char *name);
 
 Archive* sort_archive(Archive* arch, int mode);
 Node* insert_node(Node* sorted_head, Node* new_node, int mode);
