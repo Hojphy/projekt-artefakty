@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include "artifacts.h"
 #include "interface.h"
 #include "utils.h"
@@ -14,6 +13,9 @@ int main(void) {
     Archive archive;
     init_archive(&archive);
 
+    Artifact test_art = {"zubrowka", "bialystok", "podlasie", 1, 2020, "bezpieczny"};
+    add_artifact(&archive, test_art);
+
     if (load_from_file(&archive, db_filename)) {
         printf("Wczytano baze: %s\n", db_filename);
     } else {
@@ -24,8 +26,8 @@ int main(void) {
     while (running) {
         // clear_console();
         show_menu();
-        int choice = get_int_input();
-
+        //int choice = get_int_input();
+        int choice = 3;
         switch (choice) {
             case 1:
                 break;
@@ -39,7 +41,6 @@ int main(void) {
             default:
                 printf("Nieznana opcja.\n");
         }
-        printf("Nacisnij Enter...");
         getchar();
     }
 

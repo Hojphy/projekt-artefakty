@@ -3,7 +3,7 @@
 void init_archive(Archive *arch) 
 { 
     arch->count = 0;
-    arch->head = malloc(sizeof(Node));
+    arch->head = NULL;
 }
 
 void free_archive(Archive *arch)
@@ -35,34 +35,30 @@ int add_artifact(Archive *arch, Artifact new_art)
     return 1;
 }
 
-int edit_artifact(Archive *arch, Artifact *art, Artifact new_art)
-{
-    Node *current = arch->head;
-    while (current != NULL && strcmp(current->data.name, art->name) != 0)
-    {
-        current = current->next;
-    }
-
-    if (current == NULL) return 0;
-
-    char original_name[100];
-    strcpy(original_name, current->data.name);
-
-    current->data = new_art;
-
-    strcpy(current->data.name, original_name);
-    return 1;
-}
-
 Artifact* find_artifact_by_name(Archive *arch, const char *name)
 {
     Node *current = arch->head;
-    while (current != NULL && strcmp(current->data.name, name) != 0)
+    while (current != NULL && strcmp(current->data.name, name) != 0) 
     {
         current = current->next;
     }
-    if (current == NULL) return NULL;
+    if(current == NULL) return NULL;
     return &current->data;
+}
+
+int edit_artifact(Archive *arch, const char* name, Artifact new_art)
+{
+    Artifact *target = find_artifact_by_name(arch, name);
+
+    if (target == NULL) return 0;
+
+    char original_name[100];
+    strcpy(original_name, target->name);
+
+    *target = new_art;
+
+    strcpy(target->name, original_name);
+    return 1;
 }
 
 int remove_artifact_by_name(Archive *arch, const char *name)
@@ -140,6 +136,31 @@ int load_from_file(Archive *arch, const char *filename)
     return 1;
 }
 
+static int compare_artifacts(Artifact a, Artifact b, int sort_mode) 
+{
+    switch (sort_mode) 
+    {
+        case NAME_SORT:    return strcmp(a.name, b.name);
+        case ORIGIN_SORT:  return strcmp(a.origin, b.origin);
+        case CREATOR_SORT: return strcmp(a.creator_civilization, b.creator_civilization);
+        case STATUS_SORT:  return strcmp(a.status, b.status);
+        
+        case THREAT_SORT:  return a.threat_level - b.threat_level;
+        case YEAR_SORT:    return a.discovery_year - b.discovery_year;
+        
+        default: return 0;
+    }
+}
+
+static int should_swap(int cmp_result, int is_descending) 
+{
+    if (is_descending) 
+    {
+        return cmp_result > 0;
+    }
+    return cmp_result < 0;
+}
+
 Node* insert_node(Node* sorted_head, Node* new_node, int mode) 
 {
     if (sorted_head == NULL) 
@@ -148,45 +169,23 @@ Node* insert_node(Node* sorted_head, Node* new_node, int mode)
         return new_node;
     }
 
-    int insert_on_start = 0;
-    if (mode == NAME_SORT) 
-    {
-        if (strcmp(new_node->data.name, sorted_head->data.name) < 0) 
-        {
-            insert_on_start = 1;
-        }
-    } 
-    else if (mode == THREAT_SORT) 
-    {
-        if (new_node->data.threat_level > sorted_head->data.threat_level) 
-        {
-            insert_on_start = 1;
-        }
-    }
-
-    if (insert_on_start) 
+    int sort_mode = mode & SORT_MASK; // 0001 0100 & 0000 1111 => 0000 0100 (usuwamy kierunek sortowania)
+    int is_descending = mode & DESCENDING_SORT; // (ASC) 0000 0100 & (DESC) 0001 0000 => 0000 0000 - falsz
+  
+    int comparator = compare_artifacts(new_node->data, sorted_head->data, sort_mode);
+  
+    if (should_swap(comparator, is_descending)) 
     {
         new_node->next = sorted_head;
         return new_node;
     }
 
+    int found = 0;  
     Node* p = sorted_head;
-    int found = 0;
-
     while (p->next != NULL && !found) 
     {
-        int condition_met = 0;
-        
-        if (mode == NAME_SORT) 
-        {
-            if (strcmp(p->next->data.name, new_node->data.name) > 0) condition_met = 1;
-        }
-        else if (mode == THREAT_SORT) 
-        {
-            if (p->next->data.threat_level < new_node->data.threat_level) condition_met = 1;
-        }
-
-        if (condition_met)
+        comparator = compare_artifacts(new_node->data, p->next->data, sort_mode);
+        if (should_swap(comparator, is_descending))
         {
             found = 1;
         } 
@@ -218,4 +217,34 @@ Archive* sort_archive(Archive* arch, int mode) {
     }
     arch->head = sorted;
     return arch;
+}
+
+static void print_table_header() {
+    printf("%-30s | %-15s | %-5s | %-6s | %-15s\n", 
+           "NAZWA", "POCHODZENIE", "ZAGR.", "ROK", "STATUS");
+    printf("------------------------------------------------------------------------------------\n");
+}
+
+static void print_table_row(Artifact *a) {
+    printf("%-30s | %-15s | %-5d | %-6d | %-15s\n", 
+           a->name, a->origin, a->threat_level, a->discovery_year, a->status);
+}
+
+void print_archive(const Archive *arch) 
+{
+    if (arch->head == NULL) {
+        printf("[Baza danych jest pusta]\n");
+        return;
+    }
+
+    print_table_header();
+
+    Node *current = arch->head;
+    while (current != NULL) 
+    {
+        print_table_row(&current->data);
+        current = current->next;
+    }
+    printf("------------------------------------------------------------------------------------\n");
+    printf("Razem: %d obiektow.\n", arch->count);
 }
