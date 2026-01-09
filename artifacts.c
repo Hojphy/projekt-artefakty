@@ -200,7 +200,8 @@ Node* insert_node(Node* sorted_head, Node* new_node, int mode)
     return sorted_head;
 }
 
-Archive* sort_archive(Archive* arch, int mode) {
+Archive* sort_archive(Archive* arch, int mode) 
+{
     if (arch->head == NULL) return arch;
 
     Node* sorted = NULL;
@@ -219,13 +220,15 @@ Archive* sort_archive(Archive* arch, int mode) {
     return arch;
 }
 
-static void print_table_header() {
+static void print_table_header() 
+{
     printf("%-30s | %-15s | %-5s | %-6s | %-15s\n", 
            "NAZWA", "POCHODZENIE", "ZAGR.", "ROK", "STATUS");
     printf("------------------------------------------------------------------------------------\n");
 }
 
-static void print_table_row(Artifact *a) {
+static void print_table_row(Artifact *a) 
+{
     printf("%-30s | %-15s | %-5d | %-6d | %-15s\n", 
            a->name, a->origin, a->threat_level, a->discovery_year, a->status);
 }
