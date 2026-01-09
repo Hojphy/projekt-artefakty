@@ -6,6 +6,9 @@
 #include "artifacts.h"
 
 void show_menu();
-void print_archive(const Archive* arch);
+
+void print_artifacts_by_fragment(const Archive *arch, const char *fragment);
+void print_artifacts_by_threat(const Archive *arch, const int level);
+
 
 #endif

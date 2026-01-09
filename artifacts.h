@@ -1,6 +1,25 @@
 #ifndef ARTIFACTS_H
 #define ARTIFACTS_H
 
+#define NAME_SORT 0x01
+#define ORIGIN_SORT 0x02
+#define CREATOR_SORT 0x03
+#define THREAT_SORT 0x04
+#define YEAR_SORT 0x05
+#define STATUS_SORT 0x06
+
+#define ASCENDING_SORT 0x00
+#define DESCENDING_SORT 0x10
+
+#define SORT_MASK 0x0F
+
+#include "stdlib.h"
+#include "stdio.h"
+#include "stdlib.h"
+#include "string.h"
+#include "time.h"
+#include "errno.h"
+
 typedef struct {
     char name[100];
     char origin[50];
@@ -24,13 +43,17 @@ void init_archive(Archive *arch);
 void free_archive(Archive *arch);
 
 int add_artifact(Archive *arch, Artifact new_art);
-int remove_artifact_by_index(Archive *arch, int index);
-int remove_artifacts_by_criteria(Archive *arch, const char *origin);
+int edit_artifact(Archive *arch, const char* name, Artifact new_art);
+int remove_artifact_by_name(Archive *arch, const char *name);
 
-void sort_archive(Archive *arch, int mode);
-Archive filter_archive(const Archive *arch, const char *query, int min_threat);
+Archive* sort_archive(Archive* arch, int mode);
+Node* insert_node(Node* sorted_head, Node* new_node, int mode);
 
 int save_to_file(const Archive *arch, const char *filename);
 int load_from_file(Archive *arch, const char *filename);
+
+static void print_table_header();
+static void print_table_row(Artifact *a);
+void print_archive(const Archive *arch) ;
 
 #endif
