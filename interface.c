@@ -47,9 +47,24 @@ void run_loop(Archive* archive, const char* db_filename)
                 wait_for_enter();
                 break;
             case MENU_SEARCH_NAME:
+            {
+                char fragment[100];
+                printf("Wprowadz fragment elementu: ");
+                get_string_input(fragment, 100); 
+                print_artifacts_by_fragment(archive, fragment);
+                
+                wait_for_enter();
                 break;
+            }
             case MENU_SEARCH_THREAT:
+            {
+                printf("Wprowadz minimalny poziom zagrozenia: ");
+                int level = get_int_input();
+                print_artifacts_by_threat(archive, level);
+                
+                wait_for_enter();
                 break;
+            }
             case MENU_SORT:
                 current_mode = get_sort_criteria_from_user();
                 sort_archive(archive, current_mode | current_direction);
@@ -135,7 +150,34 @@ static int get_int_input()
 
 static void handle_add_artifact(Archive* arch)
 {
+    Artifact new_art;
+
+    printf("Podaj nazwe artefaktu: ");
+    get_string_input(new_art.name, 100);
+
+    char *origin;
+    printf("Podaj pochodzenie artefaktu: ");
+    get_string_input(new_art.origin, 50);
+
+    char *civilization;
+    printf("Podaj nazwe cywilizacji artefaktu: ");
+    get_string_input(new_art.creator_civilization, 50);
+
+    printf("Podaj poziom zagrozenia artefaktu: ");
+    new_art.threat_level = get_int_input();
+
+    printf("Podaj rok odkrycia artefaktu: ");
+    new_art.discovery_year = get_int_input();
     
+    int level = new_art.threat_level;
+
+    handle_artifact_status(&new_art);
+
+    if (add_artifact(arch, new_art)) {
+        printf("\nSukces! Artefakt dodany.\n");
+    } else {
+        printf("\nBlad dodawania (brak pamieci?).\n");
+    }
 }
 
 static int get_sort_criteria_from_user() 

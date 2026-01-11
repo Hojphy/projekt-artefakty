@@ -220,18 +220,85 @@ Archive* sort_archive(Archive* arch, int mode)
     return arch;
 }
 
-static void print_table_header() 
+void print_table_header() 
 {
     printf("%-30s | %-15s | %-5s | %-6s | %-15s\n", 
-           "NAZWA", "POCHODZENIE", "ZAGR.", "ROK", "STATUS");
+           "NAZWA", "CYWILIZACJA", "ZAGR.", "ROK", "STATUS");
     printf("------------------------------------------------------------------------------------\n");
 }
 
-static void print_table_row(Artifact *a) 
+void print_table_row(Artifact *a) 
 {
     printf("%-30s | %-15s | %-5d | %-6d | %-15s\n", 
            a->name, a->origin, a->threat_level, a->discovery_year, a->status);
 }
+
+void print_artifacts_by_fragment(const Archive *arch, const char *fragment)
+{
+    Node* current = arch->head;
+    int len = strlen(fragment);
+    int not_empty = 0;
+
+    printf("\nWyniki wyszukiwania dla '%s':\n", fragment);
+    print_table_header();
+    while (current != NULL)
+    {
+        if (strncmp(current->data.name, fragment, len) == 0)
+        {
+            print_table_row(&current->data);
+            not_empty = 1;
+        }
+        current = current->next;
+    }
+
+    if (!not_empty)
+    {
+        printf("Brak wynikow.\n");
+    }
+}
+
+void print_artifacts_by_threat(const Archive *arch, const int min_level)
+{
+    Node* current = arch->head;
+    int not_empty = 0;
+    printf("\nWyniki wyszukiwania dla poziomu '%d' i wyzszego:\n", min_level);
+    print_table_header();
+    while (current != NULL)
+    {
+        if (current->data.threat_level >= min_level)
+        {
+            print_table_row(&current->data);
+            not_empty = 1;
+        }
+        current = current->next;
+    }
+
+    if (!not_empty)
+    {
+        printf("Brak wynikow.\n");
+    }
+}
+
+void handle_artifact_status(Artifact* art)
+{
+    int level = art->threat_level;
+    if (level >= 9) {
+        strcpy(art->status, "ZAKAZANY");
+    } 
+    else if (level >= 7) {
+        strcpy(art->status, "Wymaga kwarantanny");
+    } 
+    else if (level >= 5) {
+        strcpy(art->status, "Niestabilny");
+    } 
+    else if (level >= 3) {
+        strcpy(art->status, "W trakcie badan");
+    } 
+    else {
+        strcpy(art->status, "Bezpieczny");
+    }
+}
+
 
 void print_archive(const Archive *arch) 
 {
