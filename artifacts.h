@@ -45,6 +45,7 @@ void free_archive(Archive *arch);
 int add_artifact(Archive *arch, Artifact new_art);
 int edit_artifact(Archive *arch, const char* name, Artifact new_art);
 int remove_artifact_by_name(Archive *arch, const char *name);
+Artifact* find_artifact_by_name(Archive *arch, const char *name);
 
 void handle_artifact_status(Artifact* art);
 

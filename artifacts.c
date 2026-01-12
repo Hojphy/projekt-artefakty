@@ -222,15 +222,15 @@ Archive* sort_archive(Archive* arch, int mode)
 
 void print_table_header() 
 {
-    printf("%-30s | %-15s | %-5s | %-6s | %-15s\n", 
-           "NAZWA", "CYWILIZACJA", "ZAGR.", "ROK", "STATUS");
-    printf("------------------------------------------------------------------------------------\n");
+    printf("%-30s | %-15s | %-15s | %-5s | %-6s | %-15s\n", 
+           "NAZWA", "POCHODZENIE",  "CYWILIZACJA", "ZAGR.", "ROK", "STATUS");
+    printf("---------------------------------------------------------------------------------------------------\n");
 }
 
 void print_table_row(Artifact *a) 
 {
-    printf("%-30s | %-15s | %-5d | %-6d | %-15s\n", 
-           a->name, a->origin, a->threat_level, a->discovery_year, a->status);
+    printf("%-30s | %-15s | %-15s | %-5d | %-6d | %-15s\n", 
+           a->name, a->origin, a->creator_civilization, a->threat_level, a->discovery_year, a->status);
 }
 
 void print_artifacts_by_fragment(const Archive *arch, const char *fragment)
@@ -315,6 +315,6 @@ void print_archive(const Archive *arch)
         print_table_row(&current->data);
         current = current->next;
     }
-    printf("------------------------------------------------------------------------------------\n");
+    printf("---------------------------------------------------------------------------------------------------\n");
     printf("Razem: %d obiektow.\n", arch->count);
 }

@@ -20,7 +20,7 @@ enum MenuOption
 };
 
 void show_menu();
-void run_loop(Archive* archive, const char* db_filename);
+void run_loop(Archive *archive, const char *db_filename);
 
 static void clear_input_buffer();
 static void clear_console();
@@ -29,6 +29,8 @@ static int get_int_input();
 static void wait_for_enter();
 static int get_sort_criteria_from_user();
 
-static void handle_add_artifact(Archive* arch);
+static void handle_add_artifact(Archive *arch);
+static void handle_edit_artifact(Archive *arch);
+static void handle_remove_artifact(Archive *arch);
 
 #endif
