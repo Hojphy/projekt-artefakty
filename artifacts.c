@@ -82,7 +82,6 @@ int remove_artifact_by_name(Archive *arch, const char *name)
     {
         prev->next = current->next;
     }
-
     free(current);
     --arch->count;
     return 1;

@@ -1,17 +1,18 @@
 #include "interface.h"
 
-void show_menu()
+void show_menu(int dir)
 {
+    char* direction = dir == ASCENDING_SORT ? "ROSNACY" : "MALEJACY";
     printf("\n+========== SYSTEM ZARZADZANIA ARTEFAKTAMI ==========+\n");
     printf("| 1. %-47s |\n", "Dodaj nowy artefakt");
     printf("| 2. %-47s |\n", "Edytuj istniejacy artefakt");
     printf("| 3. %-47s |\n", "Usun artefakt z bazy");
     printf("| %50s |\n", "--------------------------------------------------");
     printf("| 4. %-47s |\n", "Wyswietl wszystkie artefakty (Tabela)");
-    printf("| 5. %-47s |\n", "Wyszukaj po nazwie (szukanie tekstu)");
-    printf("| 6. %-47s |\n", "Filtruj po zagrozeniu (szukanie liczby)");
+    printf("| 5. %-47s |\n", "Wyszukaj po nazwie (Po fragmencie nazwy)");
+    printf("| 6. %-47s |\n", "Filtruj po poziomie zagrozenia");
     printf("| %50s |\n", "--------------------------------------------------");
-    printf("| 7. %-47s |\n", "Posortuj baze danych");
+    printf("| 7. %-33s%-8s%-5s |\n", "Posortuj baze danych (kierunek:   ", direction, "  )");
     printf("| 8. %-47s |\n", "Przelacz kierunek sortowania (Rosnaco/Malejaco)"); 
     printf("| %50s |\n", "--------------------------------------------------");
     printf("| 9. %-47s |\n", "Zapisz zmiany do pliku (bez wychodzenia)");
@@ -29,7 +30,7 @@ void run_loop(Archive* archive, const char* db_filename)
     while (running) 
     {
         clear_console();
-        show_menu();
+        show_menu(current_direction);
         int choice = get_int_input();
         switch (choice) 
         {
@@ -49,6 +50,7 @@ void run_loop(Archive* archive, const char* db_filename)
                 wait_for_enter();
                 break;
             case MENU_PRINT_ALL:
+                clear_console();
                 print_archive(archive);
                 wait_for_enter();
                 break;
@@ -57,6 +59,7 @@ void run_loop(Archive* archive, const char* db_filename)
                 char fragment[100];
                 printf("Wprowadz fragment elementu: ");
                 get_string_input(fragment, 100); 
+                clear_console();
                 print_artifacts_by_fragment(archive, fragment);
                 
                 wait_for_enter();
@@ -66,6 +69,7 @@ void run_loop(Archive* archive, const char* db_filename)
             {
                 printf("Wprowadz minimalny poziom zagrozenia: ");
                 int level = get_int_input();
+                clear_console();
                 print_artifacts_by_threat(archive, level);
                 
                 wait_for_enter();
@@ -117,7 +121,11 @@ static void clear_input_buffer()
 
 static void clear_console()
 {
-
+    #ifdef _WIN32
+        system("cls");
+    #else
+        system("clear");
+    #endif
 }
 
 static void wait_for_enter()
@@ -173,6 +181,7 @@ static int get_int_input()
 
 static void handle_add_artifact(Archive* arch)
 {
+    clear_console();
     Artifact new_art;
 
     printf("Podaj nazwe artefaktu: ");
@@ -186,6 +195,8 @@ static void handle_add_artifact(Archive* arch)
 
     printf("Podaj poziom zagrozenia artefaktu: ");
     new_art.threat_level = get_int_input();
+    if (new_art.threat_level > 10) new_art.threat_level = 10;
+    else if (new_art.threat_level < 0) new_art.threat_level = 0;
 
     printf("Podaj rok odkrycia artefaktu: ");
     new_art.discovery_year = get_int_input();
@@ -202,6 +213,7 @@ static void handle_add_artifact(Archive* arch)
 
 static void handle_edit_artifact(Archive *arch)
 {
+    clear_console();
     print_archive(arch);
 
     printf("\nPodaj DOKLADNA nazwe artefaktu do edycji: ");
@@ -210,10 +222,16 @@ static void handle_edit_artifact(Archive *arch)
 
     Artifact *found = find_artifact_by_name(arch, target_name);
     
+    if (found == NULL) {
+        printf("Nie znaleziono artefaktu '%s'!", target_name);
+        return;
+    }
+
     int loop = 1;
     
     while(loop)
     {
+        clear_console();
         printf("\n--- WYBIERZ KRYTERIUM EDYCJI ARTEFAKTU (wybrano: '%s') ---\n", found->name);
         printf("1. Pochodzenie artefaktu (obecnie: %s)\n", found->origin);
         printf("2. Nazwa cywilizacji tworcow artefaktu (obecnie: %s)\n", found->creator_civilization);
@@ -258,19 +276,17 @@ static void handle_edit_artifact(Archive *arch)
 
 static void handle_remove_artifact(Archive *arch)
 {
-    print_archive(arch);
     
     int loop = 1;
     while(loop)
     {
-
+        clear_console();
+        print_archive(arch);
         printf("\nPodaj DOKLADNA nazwe artefaktu do usuniecia (lub '0' zeby anulowac): ");
         char target_name[100];
         get_string_input(target_name, 100);
 
-        if (strcmp(target_name, "0") == 0) {
-            break;
-        }
+        if (strcmp(target_name, "0") == 0) break;
 
         Artifact *found = find_artifact_by_name(arch, target_name);
         if (found == NULL)
@@ -280,14 +296,19 @@ static void handle_remove_artifact(Archive *arch)
         }
 
         printf("Czy na pewno chcesz usunac artefakt o nazwie: '%s'?\n[T/N] ", found->name);
-        if (!get_confirmation()) continue;
-
-        if (remove_artifact_by_name(arch, found->name))
+        if (!get_confirmation()) break;
+        int return_code = remove_artifact_by_name(arch, found->name);
+        if (return_code == 1)
         {
             printf("Pomyslnie usunieto artefakt!\n");
             loop = 0;
         }
-        else 
+        else if (return_code == -1)
+        {
+            printf("Artefakt jest zbyt niebezpieczny, nie mozna go usunac!\n");
+            loop = 0;
+        }
+        else
         {
             printf("Wystapil blad przy usuwaniu artefaktu!\n");
             loop = 0;
@@ -297,7 +318,8 @@ static void handle_remove_artifact(Archive *arch)
 
 static int get_sort_criteria_from_user() 
 {
-    printf("\n--- WYBIERZ KRYTERIUM ---\n");
+    clear_console();
+    printf("\n--- WYBIERZ KRYTERIUM SORTOWANIA BAZY ---\n");
     printf("1. Nazwa\n");
     printf("2. Pochodzenie\n");
     printf("3. Poziom zagrozenia\n");

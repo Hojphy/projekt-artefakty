@@ -19,7 +19,7 @@ enum MenuOption
     MENU_SAVE = 9
 };
 
-void show_menu();
+void show_menu(int dir);
 void run_loop(Archive *archive, const char *db_filename);
 
 static void clear_input_buffer();
