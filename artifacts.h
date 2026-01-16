@@ -45,6 +45,9 @@ void free_archive(Archive *arch);
 int add_artifact(Archive *arch, Artifact new_art);
 int edit_artifact(Archive *arch, const char* name, Artifact new_art);
 int remove_artifact_by_name(Archive *arch, const char *name);
+Artifact* find_artifact_by_name(Archive *arch, const char *name);
+
+void handle_artifact_status(Artifact* art);
 
 Archive* sort_archive(Archive* arch, int mode);
 Node* insert_node(Node* sorted_head, Node* new_node, int mode);
@@ -52,8 +55,10 @@ Node* insert_node(Node* sorted_head, Node* new_node, int mode);
 int save_to_file(const Archive *arch, const char *filename);
 int load_from_file(Archive *arch, const char *filename);
 
-static void print_table_header();
-static void print_table_row(Artifact *a);
-void print_archive(const Archive *arch) ;
+void print_table_header();
+void print_table_row(Artifact *a);
+void print_archive(const Archive *arch);
+void print_artifacts_by_fragment(const Archive *arch, const char *fragment);
+void print_artifacts_by_threat(const Archive *arch, const int min_level);
 
 #endif

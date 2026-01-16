@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c11 -g
-OBJ = main.o artifacts.o interface.o utils.o
+OBJ = main.o artifacts.o interface.o
 TARGET = archiwum
 
 all: $(TARGET)
