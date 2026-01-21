@@ -14,9 +14,6 @@ int main(int argc, char *argv[]) {
     Archive archive;
     init_archive(&archive);
 
-    Artifact test_art = {"zubrowka3", "bialystok", "podlasie", 1, 2020, "bezpieczny"};
-    add_artifact(&archive, test_art);
-
     if (load_from_file(&archive, db_filename)) {
         printf("Wczytano baze: %s\n", db_filename);
     } else {

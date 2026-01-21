@@ -55,8 +55,7 @@ Node* insert_node(Node* sorted_head, Node* new_node, int mode);
 int save_to_file(const Archive *arch, const char *filename);
 int load_from_file(Archive *arch, const char *filename);
 
-void print_table_header();
-void print_table_row(Artifact *a);
+void print_artifact(Artifact *a, int i);
 void print_archive(const Archive *arch);
 void print_artifacts_by_fragment(const Archive *arch, const char *fragment);
 void print_artifacts_by_threat(const Archive *arch, const int min_level);

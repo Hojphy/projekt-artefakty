@@ -168,8 +168,8 @@ Node* insert_node(Node* sorted_head, Node* new_node, int mode)
         return new_node;
     }
 
-    int sort_mode = mode & SORT_MASK; // 0001 0100 & 0000 1111 => 0000 0100 (usuwamy kierunek sortowania)
-    int is_descending = mode & DESCENDING_SORT; // (ASC) 0000 0100 & (DESC) 0001 0000 => 0000 0000 - falsz
+    int sort_mode = mode & SORT_MASK;
+    int is_descending = mode & DESCENDING_SORT;
   
     int comparator = compare_artifacts(new_node->data, sorted_head->data, sort_mode);
   
@@ -219,17 +219,14 @@ Archive* sort_archive(Archive* arch, int mode)
     return arch;
 }
 
-void print_table_header() 
+void print_artifact(Artifact *a, int i) 
 {
-    printf("%-30s | %-15s | %-15s | %-5s | %-6s | %-15s\n", 
-           "NAZWA", "POCHODZENIE",  "CYWILIZACJA", "ZAGR.", "ROK", "STATUS");
-    printf("---------------------------------------------------------------------------------------------------\n");
-}
-
-void print_table_row(Artifact *a) 
-{
-    printf("%-30s | %-15s | %-15s | %-5d | %-6d | %-15s\n", 
-           a->name, a->origin, a->creator_civilization, a->threat_level, a->discovery_year, a->status);
+        printf("--------------------------------------------------------------------------------\n");
+        
+        printf("[%d] %s\n", i, a->name);
+        printf("    Pochodzenie: %s\n", a->origin);
+        printf("    Tworca:      %s\n", a->creator_civilization);
+        printf("    DANE:        Rok: %-5d | Zagrozenie: %-2d | Status: %s\n", a->discovery_year, a->threat_level, a->status);
 }
 
 void print_artifacts_by_fragment(const Archive *arch, const char *fragment)
@@ -239,16 +236,18 @@ void print_artifacts_by_fragment(const Archive *arch, const char *fragment)
     int not_empty = 0;
 
     printf("\nWyniki wyszukiwania dla '%s':\n", fragment);
-    print_table_header();
+    int i = 1;
     while (current != NULL)
     {
         if (strncmp(current->data.name, fragment, len) == 0)
         {
-            print_table_row(&current->data);
+            print_artifact(&current->data, i);
+            ++i;
             not_empty = 1;
         }
         current = current->next;
     }
+    printf("--------------------------------------------------------------------------------\n");
 
     if (!not_empty)
     {
@@ -261,16 +260,19 @@ void print_artifacts_by_threat(const Archive *arch, const int min_level)
     Node* current = arch->head;
     int not_empty = 0;
     printf("\nWyniki wyszukiwania dla poziomu '%d' i wyzszego:\n", min_level);
-    print_table_header();
+    int i = 1;
     while (current != NULL)
     {
         if (current->data.threat_level >= min_level)
         {
-            print_table_row(&current->data);
+            print_artifact(&current->data, i);
+            ++i;
             not_empty = 1;
         }
         current = current->next;
     }
+
+    printf("--------------------------------------------------------------------------------\n");
 
     if (!not_empty)
     {
@@ -306,12 +308,12 @@ void print_archive(const Archive *arch)
         return;
     }
 
-    print_table_header();
-
     Node *current = arch->head;
+    int i = 1;
     while (current != NULL) 
     {
-        print_table_row(&current->data);
+        print_artifact(&current->data, i);
+        ++i;
         current = current->next;
     }
     printf("---------------------------------------------------------------------------------------------------\n");
