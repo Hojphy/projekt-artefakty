@@ -35,6 +35,29 @@ int add_artifact(Archive *arch, Artifact new_art)
     return 1;
 }
 
+void append_artifact(Archive *arch, Artifact data) 
+{
+    Node *new_node = malloc(sizeof(Node));
+    if (!new_node) return;
+    new_node->data = data;
+    new_node->next = NULL;
+
+    if (arch->head == NULL) 
+    {
+        arch->head = new_node;
+    }
+    else 
+    {
+        Node *current = arch->head;
+        while (current->next != NULL)
+        {
+            current = current->next;
+        }
+        current->next = new_node;
+    }
+    arch->count++;
+}
+
 Artifact* find_artifact_by_name(Archive *arch, const char *name)
 {
     Node *current = arch->head;
@@ -115,6 +138,7 @@ int load_from_file(Archive *arch, const char *filename)
         free_archive(arch);
     }
 
+    arch->count = 0;
     int arch_size = 0;
     if (fread(&arch_size, sizeof(int), 1, fp) != 1) 
     {
@@ -127,7 +151,7 @@ int load_from_file(Archive *arch, const char *filename)
     {
         if (fread(&temp_art, sizeof(Artifact), 1, fp) == 1) 
         {
-            add_artifact(arch, temp_art);
+            append_artifact(arch, temp_art);
         }
     }
 

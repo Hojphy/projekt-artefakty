@@ -93,7 +93,6 @@ void run_loop(Archive* archive, const char* db_filename)
                     current_direction = ASCENDING_SORT;
                     printf("Zmieniono na: ROSNACO\n");
                 }
-                sort_archive(archive, current_mode | current_direction);
 
                 wait_for_enter();
                 break;
