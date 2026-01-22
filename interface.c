@@ -212,25 +212,26 @@ static void handle_add_artifact(Archive* arch)
 
 static void handle_edit_artifact(Archive *arch)
 {
-    clear_console();
-    print_archive(arch);
-
-    printf("\nPodaj DOKLADNA nazwe artefaktu do edycji: ");
-    char target_name[100];
-    get_string_input(target_name, 100);
-
-    Artifact *found = find_artifact_by_name(arch, target_name);
-    
-    if (found == NULL) {
-        printf("Nie znaleziono artefaktu '%s'!", target_name);
-        return;
-    }
-
     int loop = 1;
     
     while(loop)
     {
         clear_console();
+        print_archive(arch);
+
+        printf("\nPodaj DOKLADNA nazwe artefaktu do edycji (lub '0' zeby stad wyjsc): ");
+        char target_name[100];
+        get_string_input(target_name, 100);
+
+        if (strcmp(target_name, "0") == 0) break;
+
+        Artifact *found = find_artifact_by_name(arch, target_name);
+        
+        if (found == NULL) {
+            printf("Nie znaleziono artefaktu '%s'!", target_name);
+            return;
+        }
+
         printf("\n--- WYBIERZ KRYTERIUM EDYCJI ARTEFAKTU (wybrano: '%s') ---\n", found->name);
         printf("1. Pochodzenie artefaktu (obecnie: %s)\n", found->origin);
         printf("2. Nazwa cywilizacji tworcow artefaktu (obecnie: %s)\n", found->creator_civilization);
@@ -281,7 +282,7 @@ static void handle_remove_artifact(Archive *arch)
     {
         clear_console();
         print_archive(arch);
-        printf("\nPodaj DOKLADNA nazwe artefaktu do usuniecia (lub '0' zeby anulowac): ");
+        printf("\nPodaj DOKLADNA nazwe artefaktu do usuniecia (lub '0' zeby stad wyjsc): ");
         char target_name[100];
         get_string_input(target_name, 100);
 
